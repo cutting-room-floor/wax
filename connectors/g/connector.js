@@ -65,7 +65,7 @@ wax.g.connector.prototype.getTileUrl = function(coord, z) {
     var mod = Math.pow(2, z),
         y = (this.options.scheme === 'tms') ?
             (mod - 1) - coord.y :
-            y,
+            coord.y,
         x = (coord.x % mod);
 
     x = (x < 0) ? (coord.x % mod) + mod : x;
