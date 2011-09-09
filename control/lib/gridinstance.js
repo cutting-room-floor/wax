@@ -26,8 +26,8 @@ wax.GridInstance = function(grid_tile, formatter, options) {
     instance.gridFeature = function(x, y) {
         if (!(grid_tile && grid_tile.grid)) return;
         if ((y < 0) || (x < 0)) return;
-        if ((Math.floor(y) > tileSize) ||
-            (Math.floor(x) > tileSize)) return;
+        if ((Math.floor(y) >= tileSize) ||
+            (Math.floor(x) >= tileSize)) return;
         // Find the key in the grid. The above calls should ensure that
         // the grid's array is large enough to make this work.
         var key = resolveCode(grid_tile.grid[
