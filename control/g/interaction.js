@@ -20,19 +20,32 @@ wax.g.interaction = function(map, tilejson, options) {
 
         // This requires wax.Tooltip or similar
         callbacks: options.callbacks || new wax.tooltip(),
-
         clickAction: options.clickAction || 'full',
+        eventHandlers:{},
 
         // Attach listeners to the map
         add: function() {
-            google.maps.event.addListener(map, 'tileloaded',
+            this.eventHandlers.tileloaded = google.maps.event.addListener(map, 'tileloaded',
                 wax.util.bind(this.clearTileGrid, this));
 
-            google.maps.event.addListener(map, 'idle',
+            this.eventHandlers.idle = google.maps.event.addListener(map, 'idle',
                 wax.util.bind(this.clearTileGrid, this));
 
-            google.maps.event.addListener(map, 'mousemove', this.onMove());
-            google.maps.event.addListener(map, 'click', this.click());
+            this.eventHandlers.mousemove = google.maps.event.addListener(map, 'mousemove',
+                this.onMove());
+
+            this.eventHandlers.click = google.maps.event.addListener(map, 'click',
+                this.click());
+
+            return this;
+        },
+
+        // Remove interaction events from the map.
+        remove: function() {
+            google.maps.event.removeListener(this.eventHandlers.tileloaded);
+            google.maps.event.removeListener(this.eventHandlers.idle);
+            google.maps.event.removeListener(this.eventHandlers.mousemove);
+            google.maps.event.removeListener(this.eventHandlers.click);
             return this;
         },
 
@@ -76,9 +89,9 @@ wax.g.interaction = function(map, tilejson, options) {
             var grid = this.getTileGrid();
             for (var i = 0; i < grid.length; i++) {
                 if ((grid[i][0] < evt.pixel.y) &&
-                   ((grid[i][0] + 256) > evt.pixel.y) &&
+                    ((grid[i][0] + 256) > evt.pixel.y) &&
                     (grid[i][1] < evt.pixel.x) &&
-                   ((grid[i][1] + 256) > evt.pixel.x)) {
+                    ((grid[i][1] + 256) > evt.pixel.x)) {
                     tile = grid[i][2];
                     break;
                 }
