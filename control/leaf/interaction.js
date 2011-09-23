@@ -1,190 +1,230 @@
-wax = wax || {};
-wax.leaf = wax.leaf || {};
-
-// A chaining-style control that adds
-// interaction to a Leaflet.Map object.
-//
-// Takes an options object with the following keys:
-//
-// * `callbacks` (optional): an `out`, `over`, and `click` callback.
 //   If not given, the `wax.tooltip` library will be expected.
 // * `clickAction` (optional): **full** or **location**: default is
 //   **full**.
 wax.leaf.interaction = function(map, tilejson, options) {
     tilejson = tilejson || {};
     options = options || {};
-    // Our GridManager (from `gridutil.js`). This will keep the
-    // cache of grid information and provide friendly utility methods
-    // that return `GridTile` objects instead of raw data.
-    var interaction = {
-        modifyingEvents: ['move'],
+	
+	var waxGM = wax.GridManager(tilejson),
+		callbacks = options.callbacks || new wax.tooltip(options),
+		clickAction = options.clickAction || ['full', 'location'],
+		clickHandler = options.clickHandler || function(url) {
+			window.location = url;
+		},
+		interaction = {},
+		_downLock = false,
+		_clickTimeout = false,
+		touchable = ('ontouchstart' in document.documentElement),
+		// Active feature
+		_af,
+		// Down event
+		_d,
+		// Touch tolerance
+		tol = 4,
+		tileGrid;
+	
+	// Search through `.tiles` and determine the position,
+    // from the top-left of the **document**, and cache that data
+    // so that `mousemove` events don't always recalculate.
+    function getTileGrid() {
+        // TODO: don't build for tiles outside of viewport
+        // Touch interaction leads to intermediate
+        //var zoomLayer = map.createOrGetLayer(Math.round(map.getZoom())); //?what is this doing?
+        // Calculate a tile grid and cache it, by using the `.tiles`
+        // element on this map.
+        return tileGrid || (tileGrid =
+            (function(layers) {
+				var o = [];
+				for (var layerId in layers) {
+					// This only supports tiled layers
+					if (layers[layerId]._tiles) {
+						for (var tile in layers[layerId]._tiles) {
+							var offset = wax.util.offset(layers[layerId]._tiles[tile]);
+							o.push([offset.top, offset.left, layers[layerId]._tiles[tile]]);
+						}
+					}
+				}
+				return o;
+			})(map._layers));
+    };
 
-        waxGM: new wax.GridManager(tilejson),
+	// When the map moves, the tile grid is no longer valid.
+    function clearTileGrid(map, e) {
+        tileGrid = null;
+    }
 
-        // This requires wax.Tooltip or similar
-        callbacks: options.callbacks || new wax.tooltip(),
-
-        clickAction: options.clickAction || 'full',
-
-        // Attach listeners to the map
-        add: function() {
-            for (var i = 0; i < this.modifyingEvents.length; i++) {
-                map.on(
-                    this.modifyingEvents[i],
-                    wax.util.bind(this.clearTileGrid, this)
-                );
-            }
-            L.DomEvent.addListener(map._container, 'mousemove', this.onMove(), this);
-            L.DomEvent.addListener(map._container, 'mousemove', this.mouseDown(), this);
-            return this;
-        },
-
-        // Search through `._layers` and determine the position,
-        // from the top-left of the **document**, and cache that data
-        // so that `mousemove` events don't always recalculate.
-        getTileGrid: function() {
-            // TODO: don't build for tiles outside of viewport
-            // var zoom = map.getZoom();
-            // Calculate a tile grid and cache it, by using the `.tiles`
-            // element on this map.
-            //
-            // For now assume only one layer
-            return this._getTileGrid || (this._getTileGrid =
-                (function(layers) {
-                    var o = [];
-                    for (var layerId in layers) {
-                        // This only supports tiled layers
-                        if (layers[layerId]._tiles) {
-                            for (var tile in layers[layerId]._tiles) {
-                                var offset = wax.util.offset(layers[layerId]._tiles[tile]);
-                                o.push([offset.top, offset.left, layers[layerId]._tiles[tile]]);
-                            }
-                        }
-                    }
-                    return o;
-                })(map._layers));
-        },
-
-        clearTileGrid: function(map, e) {
-            this._getTileGrid = null;
-        },
-
-        getTile: function(evt) {
-            var tile;
-            var grid = this.getTileGrid();
-            for (var i = 0; i < grid.length; i++) {
-                if ((grid[i][0] < evt.y) &&
-                   ((grid[i][0] + 256) > evt.y) &&
-                    (grid[i][1] < evt.x) &&
-                   ((grid[i][1] + 256) > evt.x)) {
-                    tile = grid[i][2];
-                    break;
-                }
-            }
-            return tile || false;
-        },
-
-        // Clear the double-click timeout to prevent double-clicks from
-        // triggering popups.
-        clearTimeout: function() {
-            if (this.clickTimeout) {
-                window.clearTimeout(this.clickTimeout);
-                this.clickTimeout = null;
-                return true;
-            } else {
-                return false;
-            }
-        },
-
-        onMove: function(evt) {
-            if (!this._onMove) this._onMove = wax.util.bind(function(evt) {
-                var pos = wax.util.eventoffset(evt);
-                var tile = this.getTile(pos);
-                if (tile) {
-                    this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
-                        if (err) return;
-                        if (g) {
-                            var feature = g.tileFeature(pos.x, pos.y, tile, {
-                                format: 'teaser'
-                            });
-                            // This and other Modest Maps controls only support a single layer.
-                            // Thus a layer index of **0** is given to the tooltip library
-                            if (feature) {
-                                if (feature && this.feature !== feature) {
-                                    this.feature = feature;
-                                    this.callbacks.out(map._container);
-                                    this.callbacks.over(feature, map._container);
-                                } else if (!feature) {
-                                    this.feature = null;
-                                    this.callbacks.out(map._container);
-                                }
-                            } else {
-                                this.feature = null;
-                                this.callbacks.out(map._container);
-                            }
-                        }
-                    }, this));
-                }
-            }, this);
-            return this._onMove;
-        },
-
-        mouseDown: function(evt) {
-            if (!this._mouseDown) this._mouseDown = wax.util.bind(function(evt) {
-                // Ignore double-clicks by ignoring clicks within 300ms of
-                // each other.
-                if (this.clearTimeout()) {
-                    return;
-                }
-                // Store this event so that we can compare it to the
-                // up event
-                this.downEvent = evt;
-                L.DomEvent.addListener(map._container, 'mouseup', this.mouseUp(), this);
-            }, this);
-            return this._mouseDown;
-        },
-
-        mouseUp: function() {
-            if (!this._mouseUp) this._mouseUp = wax.util.bind(function(evt) {
-                L.DomEvent.removeListener(map._container, 'mouseup', this.mouseUp(), this);
-                // Don't register clicks that are likely the boundaries
-                // of dragging the map
-                var tol = 4; // tolerance
-                if (Math.round(evt.pageY / tol) === Math.round(this.downEvent.pageY / tol) &&
-                    Math.round(evt.pageX / tol) === Math.round(this.downEvent.pageX / tol)) {
-                    // Contain the event data in a closure.
-                    this.clickTimeout = window.setTimeout(
-                        wax.util.bind(function() { this.click()(evt); }, this), 300);
-                }
-            }, this);
-            return this._mouseUp;
-        },
-
-        click: function(evt) {
-            if (!this._onClick) this._onClick = wax.util.bind(function(evt) {
-                var tile = this.getTile(evt);
-                if (tile) {
-                    this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
-                        if (g) {
-                            var feature = g.tileFeature(evt.pageX, evt.pageY, tile, {
-                                format: this.clickAction
-                            });
-                            if (feature) {
-                                switch (this.clickAction) {
-                                    case 'full':
-                                        this.callbacks.click(feature, map._container);
-                                        break;
-                                    case 'location':
-                                        window.location = feature;
-                                        break;
-                                }
-                            }
-                        }
-                    }, this));
-                }
-            }, this);
-            return this._onClick;
+    function getTile(e) {
+        for (var i = 0, grid = getTileGrid(); i < grid.length; i++) {
+            if ((grid[i][0] < e.y) &&
+               ((grid[i][0] + 256) > e.y) &&
+                (grid[i][1] < e.x) &&
+               ((grid[i][1] + 256) > e.x)) return grid[i][2];
         }
+        return false;
+    }
+
+	// Clear the double-click timeout to prevent double-clicks from
+    // triggering popups.
+    function killTimeout() {
+        if (_clickTimeout) {
+            window.clearTimeout(_clickTimeout);
+            _clickTimeout = null;
+            return true;
+        } else {
+            return false;
+        }
+    }
+	
+	function onMove(e) {
+        // If the user is actually dragging the map, exit early
+        // to avoid performance hits.
+        if (_downLock) return;
+
+        var pos = wax.util.eventoffset(e),
+            tile = getTile(pos),
+            feature;
+
+        if (tile) waxGM.getGrid(tile.src, function(err, g) {
+            if (err || !g) return;
+            feature = g.tileFeature(pos.x, pos.y, tile, {
+                format: 'teaser'
+            });
+            if (feature) {
+                if (feature && _af !== feature) {
+                    _af = feature;
+                    callbacks.out(map._container);
+                    callbacks.over(feature, map._container);
+                } else if (!feature) {
+                    _af = null;
+                    callbacks.out(map._container);
+                }
+            } else {
+                _af = null;
+                callbacks.out(map._container);
+            }
+        });
+    }
+	
+	// A handler for 'down' events - which means `mousedown` and `touchstart`
+    function onDown(e) {
+        // Ignore double-clicks by ignoring clicks within 300ms of
+        // each other.
+        if (killTimeout()) { return; }
+
+        // Prevent interaction offset calculations happening while
+        // the user is dragging the map.
+        //
+        // Store this event so that we can compare it to the
+        // up event
+        _downLock = true;
+        _d = wax.util.eventoffset(e);
+        if (e.type === 'mousedown') {
+			L.DomEvent.addListener(map._container, 'mouseup', onUp, this);
+
+        // Only track single-touches. Double-touches will not affect this
+        // control
+        } else if (e.type === 'touchstart' && e.touches.length === 1) {
+
+            // turn this into touch-mode. Fallback to teaser and full.
+            clickAction = ['full', 'teaser'];
+
+            // Don't make the user click close if they hit another tooltip
+            if (callbacks._currentTooltip) {
+                callbacks.hideTooltip(callbacks._currentTooltip);
+            }
+
+            // Touch moves invalidate touches
+			
+            L.DomEvent.addListener(map._container, 'touchend', onUp, this);
+            L.DomEvent.addListener(map._container, 'touchmove', touchCancel, this);
+        }
+    }
+	
+	function touchCancel() {
+		L.DomEvent.removeListener(map._container, 'touchend', onUp);
+        L.DomEvent.removeListener(map._container, 'touchmove', onUp);
+        _downLock = false;
+    }
+	
+	function onUp(e) {
+        var pos = wax.util.eventoffset(e);
+        _downLock = false;
+
+        L.DomEvent.removeListener(map._container, 'mouseup', onUp);
+
+        if (map._container.ontouchend) {
+            L.DomEvent.removeListener(map._container, 'touchend', onUp);
+            L.DomEvent.removeListener(map._container, 'touchmove', _touchCancel);
+        }
+
+        if (e.type === 'touchend') {
+            // If this was a touch and it survived, there's no need to avoid a double-tap
+            click(e, _d);
+        } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
+            Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
+            // Contain the event data in a closure.
+            _clickTimeout = window.setTimeout(
+                function() {
+                    _clickTimeout = null;
+                    click(e, pos);
+                }, 300);
+        }
+        return onUp;
+    }
+	
+	// Handle a click event. Takes a second
+    function click(e, pos) {
+        var tile = getTile(pos),
+            feature;
+
+        if (tile) waxGM.getGrid(tile.src, function(err, g) {
+            for (var i = 0; g && i < clickAction.length; i++) {
+                feature = g.tileFeature(pos.x, pos.y, tile, {
+                    format: clickAction[i]
+                });
+                if (feature) {
+                    switch (clickAction[i]) {
+                        case 'full':
+                        // clickAction can be teaser in touch interaction
+                        case 'teaser':
+                            return callbacks.click(feature, map._container, 0, e);
+                        case 'location':
+                            return clickHandler(feature);
+                    }
+                }
+            }
+        });
+    }
+	
+	// Attach listeners to the map
+    interaction.add = function() {
+        var l = ['moveend', 'layerswitched'];
+        for (var i = 0; i < l.length; i++) {
+            map.on(l[i], clearTileGrid);
+        }
+        L.DomEvent.addListener(map._container, 'mousemove', onMove);
+        L.DomEvent.addListener(map._container, 'mousedown', onDown);
+        if (touchable) {
+            L.DomEvent.addListener(map._container, 'touchstart', onDown);
+        }
+        return this;
+    };
+
+    // Remove this control from the map.
+    interaction.remove = function() {
+        var l = ['moveend', 'layerswitched'];
+        for (var i = 0; i < l.length; i++) {
+            map.off(l[i], clearTileGrid);
+        }
+        L.DomEvent.removeListener(map._container, 'mousemove', onMove);
+        L.DomEvent.removeListener(map._container, 'mousedown', onDown);
+        if (touchable) {
+            L.DomEvent.removeListener(map._container, 'touchstart', onDown);
+        }
+        if (callbacks._currentTooltip) {
+            callbacks.hideTooltip(callbacks._currentTooltip);
+        }
+        return this;
     };
 
     // Ensure chainability
