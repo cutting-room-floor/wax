@@ -1,4 +1,4 @@
-/* wax - 4.1.2 - 1.0.4-459-gbcf7bdb */
+/* wax - 4.1.2 - 1.0.4-461-g7ed511c */
 
 
 /*!
@@ -2417,6 +2417,7 @@ wax.mm.fullscreen = function(map) {
     var state = false,
         fullscreen = {},
         a,
+        body = document.body,
         smallSize;
 
     function click(e) {
@@ -2443,13 +2444,15 @@ wax.mm.fullscreen = function(map) {
         if (state) { return; } else { state = true; }
         smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
         map.parent.className += ' wax-fullscreen-map';
+        body.className += ' wax-fullscreen-view';
         map.setSize(
             map.parent.offsetWidth,
             map.parent.offsetHeight);
     };
     fullscreen.original = function() {
         if (!state) { return; } else { state = false; }
-        map.parent.className = map.parent.className.replace('wax-fullscreen-map', '');
+        map.parent.className = map.parent.className.replace(' wax-fullscreen-map', '');
+        body.className = body.className.replace(' wax-fullscreen-view', '');
         map.setSize(
             smallSize[0],
             smallSize[1]);
