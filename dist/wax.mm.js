@@ -2659,8 +2659,14 @@ wax.mm.interaction = function(map, tilejson, options) {
     }
 
     function onUp(e) {
-        var pos = eventoffset(e);
+        var event = {},
+            pos = eventoffset(e);
+        
         _downLock = false;
+
+        for (var key in e) {
+          event[key] = e[key];
+        }
 
         removeEvent(document.body, 'mouseup', onUp);
 
@@ -2675,11 +2681,10 @@ wax.mm.interaction = function(map, tilejson, options) {
         } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
             Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
             // Contain the event data in a closure.
-            _clickTimeout = window.setTimeout(
-                function() {
-                    _clickTimeout = null;
-                    click(e, pos);
-                }, 300);
+            _clickTimeout = window.setTimeout(function() {
+                _clickTimeout = null;
+                click(event, pos);
+            }, 50);
         }
         return onUp;
     }
