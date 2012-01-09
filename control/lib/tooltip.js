@@ -79,6 +79,7 @@ wax.tooltip.prototype.click = function(feature, context) {
     // IE compatibility.
     if (close.addEventListener) {
         close.addEventListener('click', closeClick, false);
+        close.addEventListener('touchend', closeClick, false);
     } else if (close.attachEvent) {
         close.attachEvent('onclick', closeClick);
     }

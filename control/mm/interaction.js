@@ -158,12 +158,14 @@ wax.mm.interaction = function(map, tilejson, options) {
             // Touch moves invalidate touches
             addEvent(map.parent, 'touchend', onUp);
             addEvent(map.parent, 'touchmove', touchCancel);
+            addEvent(map.parent, 'touchcancel', touchCancel);
         }
     }
 
     function touchCancel() {
         removeEvent(map.parent, 'touchend', onUp);
         removeEvent(map.parent, 'touchmove', onUp);
+        removeEvent(map.parent, 'touchcancel', touchCancel);
         _downLock = false;
     }
 
@@ -178,9 +180,10 @@ wax.mm.interaction = function(map, tilejson, options) {
 
         removeEvent(document.body, 'mouseup', onUp);
 
-        if (map.parent.ontouchend) {
+        if (touchable) {
             removeEvent(map.parent, 'touchend', onUp);
-            removeEvent(map.parent, 'touchmove', _touchCancel);
+            removeEvent(map.parent, 'touchmove', touchCancel);
+            removeEvent(map.parent, 'touchcancel', touchCancel);
         }
 
         if (e.type === 'touchend') {
