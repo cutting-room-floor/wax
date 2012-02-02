@@ -13,6 +13,7 @@ wax.ol.connector = function(tilejson) {
         tilejson.tiles, {
             sphericalMercator: true,
             zoomOffset: tilejson.minzoom,
-            numZoomLevels: tilejson.maxzoom - tilejson.minzoom
+            numZoomLevels: tilejson.maxzoom - tilejson.minzoom,
+            attribution: tilejson.attribution
         });
 };
