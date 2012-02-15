@@ -172,5 +172,28 @@ wax.util = {
     // during a given window of time.
     throttle: function(func, wait) {
         return this.limit(func, wait, false);
+    },
+
+    stopPropagation: function(event) {
+        if (event.stopPropagation) {
+            event.stopPropagation();
+        } else {
+            event.cancelBubble = true;
+        }
+    },
+
+    addListener: function(obj, type, handler) {
+        if (obj.addEventListener) {
+            obj.addEventListener(type, handler, false);
+        } else if (obj.attachEvent) {
+            obj.attachEvent('on' + type, handler);
+        }
+    },
+
+    stopMousePropagation: function(obj) {
+        wax.util.addListener(obj, 'mousemove', wax.util.stopPropagation);
+        wax.util.addListener(obj, 'mousedown', wax.util.stopPropagation);
+        wax.util.addListener(obj, 'mouseup', wax.util.stopPropagation);
+        wax.util.addListener(obj, 'click', wax.util.stopPropagation);
     }
 };
