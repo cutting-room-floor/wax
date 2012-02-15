@@ -16,23 +16,11 @@ wax.tooltip.prototype.isPopup = function(el) {
 // Get the active tooltip for a layer or create a new one if no tooltip exists.
 // Hide any tooltips on layers underneath this one.
 wax.tooltip.prototype.getTooltip = function(feature, context) {
-    var tooltip = document.createElement('div'),
-    stopPropagation = function (e) { if (e.stopPropagation) { e.stopPropagation(); } else { e.cancelBubble = true; } },
-    mouseEvents = ['mousemove', 'mousedown', 'mouseup', 'click'];
-
+    var tooltip = document.createElement('div');
     tooltip.className = 'wax-tooltip wax-tooltip-0';
     tooltip.innerHTML = feature;
     context.appendChild(tooltip);
-
-    // Stop tooltip mouse events bubbling up to the map.
-    for (var i in mouseEvents) {
-        if (tooltip.addEventListener) {
-            tooltip.addEventListener(mouseEvents[i], stopPropagation, false);
-        } else if (tooltip.attachEvent) {
-            tooltip.attachEvent('on' + mouseEvents[i], stopPropagation);
-        }
-    }
-
+    wax.util.stopMousePropagation(tooltip);
     return tooltip;
 };
 
