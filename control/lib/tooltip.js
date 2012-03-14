@@ -20,6 +20,7 @@ wax.tooltip.prototype.getTooltip = function(feature, context) {
     tooltip.className = 'wax-tooltip wax-tooltip-0';
     tooltip.innerHTML = feature;
     context.appendChild(tooltip);
+    wax.util.stopMousePropagation(tooltip);
     return tooltip;
 };
 
