@@ -2,7 +2,7 @@ wax = wax || {};
 wax.mm = wax.mm || {};
 
 wax.mm.interaction = function() {
-    var dirty = false, _grid;
+    var dirty = false, _grid, map;
 
     function grid() {
         var zoomLayer = map.getLayerAt(0)

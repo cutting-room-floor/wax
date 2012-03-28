@@ -2,7 +2,7 @@ wax = wax || {};
 wax.ol = wax.ol || {};
 
 wax.ol.interaction = function() {
-    var dirty = false, _grid;
+    var dirty = false, _grid, map;
 
     function setdirty() { dirty = true; }
 
