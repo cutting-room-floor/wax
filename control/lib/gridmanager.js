@@ -55,8 +55,9 @@ wax.gm = function() {
 
         wax.request.get(gurl, function(err, t) {
             if (err) return callback(err, null);
-            callback(null, wax.gi(t, formatter, {
-                resolution: resolution || 4
+            callback(null, wax.gi(t, {
+                formatter: formatter,
+                resolution: resolution
             }));
         });
         return manager;
@@ -70,6 +71,7 @@ wax.gm = function() {
             manager.formatter(x.formatter);
         }
         if (x.grids) manager.gridUrl(x.grids);
+        if (x.resolution) resolution = x.resolution;
         return manager;
     };
 
