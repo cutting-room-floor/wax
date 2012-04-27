@@ -10,7 +10,8 @@ wax.hash = function(options) {
     }
 
     function pushState(state) {
-        location.hash = '#' + state;
+        var l = window.location;
+        l.replace(l.toString().replace(l.hash, '#' + state));
     }
 
     var s0, // old hash
