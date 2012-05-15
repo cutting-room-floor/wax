@@ -6,30 +6,27 @@ a.wax-fullscreen {
   z-index: 99999;
   }
 
-a.zoomer {
-  text-decoration:none;
-  position:absolute;
-  background-color:#444;
-  color:#fff;
-  line-height:25px;
-  font-size:20px;
-  z-index:99999;
-  text-align:center;
-  width:25px;
-  height:25px;
+.wax-zoomer { position:absolute; z-index:100; top:10px; left:10px; }
+  .wax-zoomer a.zoomer {
+    display:inline-block;
+    text-decoration:none;
+    background-color:#444;
+    color:#fff;
+    line-height:25px;
+    font-size:20px;
+    z-index:99999;
+    text-align:center;
+    width:25px;
+    height:25px;
+    margin:0 4px 0 0;
+    -webkit-border-radius: 3px;
+    -moz-border-radius:    3px;
+    border-radius:         3px;
   }
-
-  a.zoomin {
-    left:5px;
-    }
-
-  a.zoomout {
-    left:35px;
-    }
-
-  a.zoomdisabled {
-    background-color:#333;
-    }
+  .wax-zoomer a.zoomdisabled { background-color:#CCC; }
+  .wax-zoomer .wax-zoom-scale { top:48px; left:0; }
+    .wax-zoomer .wax-zoom-scale .wax-notch { height:1px; width:20px; background:#777; }
+    .wax-zoomer .wax-zoom-scale .wax-slider { height:7px; width:20px; background:#111; }
 
 
 .wax-fullscreen-map {
