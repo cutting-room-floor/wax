@@ -1,5 +1,3 @@
-/*jslint browser: true, vars: true, forin: true, white: true, nomen: true, plusplus: true, maxerr: 50, indent: 4 */
-/*global wax: true, bean: false, toString: false */
 wax = wax || {};
 wax.mm = wax.mm || {};
 
@@ -9,7 +7,6 @@ wax.mm = wax.mm || {};
 // control. This function can be used chaining-style with other
 // chaining-style controls.
 wax.mm.zoomer = function (map, has_scale) {
-    'use strict';
 
     // Zoom level scale control.
     var scale = {
@@ -94,10 +91,10 @@ wax.mm.zoomer = function (map, has_scale) {
         _make_notch: function (level) {
             var notch = document.createElement('div'),
                 fixed_padding = this.height / (this.max - this.min),
-                spacing = this.notch_points.length * fixed_padding;
+                spacing = this.notch_points.length*fixed_padding;
 
             // Apply css to notch.
-            notch.className = "wax-notch level_" + level;
+            notch.className = "wax-notch level_"+level;
             notch.style.zIndex = "0";
             notch.style.position = "absolute";
             notch.style.top = spacing+'px';
@@ -120,7 +117,7 @@ wax.mm.zoomer = function (map, has_scale) {
             var that = this;
             
             // Get container's position on the page.
-            var slider_offset = wax.mm.zoomer.offset(this.el).top;
+            var slider_offset = wax.u.offset(this.el).top;
 
             // Set to true when the user clicks the slider.
             this.slider_pressed = false;
@@ -133,7 +130,7 @@ wax.mm.zoomer = function (map, has_scale) {
                     if (offset >= 0 && offset <= that.height) {
                         that.slider.style.top = offset + 'px';
                         level = that._level_from_slider_pos(
-                            wax.mm.zoomer.closest_in_arr(that.notch_points, offset)
+                            wax.mm.zoomer.bisect(that.notch_points, offset)
                         );
                         map.setZoom(level);
                     }
@@ -272,65 +269,12 @@ wax.mm.zoomer = function (map, has_scale) {
  * Used for determining which position the slider is closest
  * to.
  */
-wax.mm.zoomer.closest_in_arr = function (arr, x) {
-    'use strict';
-    var result, a = wax.mm.zoomer.copy(arr), len = a.length, i, nx;
-    a.sort(function (a, b) {
-         return a - b;
-    });
-    for (i=0; len > i; i++) {
-        if (x >= a[len-1]) {
-           result = a[len-1];
-           break;
-         } else if (a[i] >= x) {
-            nx = a[i-1];
-            if (Math.abs(x - a[i]) < Math.abs(x - nx)) {
-                result = a[i];
-                break;
-            } else if (Math.abs(x - nx) < Math.abs(x - a[i])) {
-                result = nx;
-                break;
-            }            
-        }                
+wax.mm.zoomer.bisect = function (a, x) {
+    var closest = null; len = a.length, i = 0;
+    while (i < len) {
+        if (closest == null || Math.abs(a[i] - x) < Math.abs(closest - x))
+            closest = a[i];
+        i++;
     }
-    return result;
-};
-
-/**
- * Utility method for cloning an array or object.
- */
-wax.mm.zoomer.copy = function (obj) {
-    'use strict';
-    var i, copy, len;
-    if (Object.prototype.toString.call(obj) === "[object Array]") {
-        copy = [];
-        for (i = 0, len = obj.length; i < len; ++i) {
-            copy[i] = wax.mm.zoomer.copy(obj[i]);
-        }
-    } else if (Object.prototype.toString.call(obj) === "[object Object]") {
-        copy = {};
-        for (i in obj) {
-            if (obj.hasOwnProperty(i)) {
-                copy[i] = wax.mm.zoomer.copy(obj[i]);
-            }
-        }
-    } else {
-        copy = obj;
-    }
-    return copy;
-};
-
-/**
- * Utility method for obtaining an elements position on a page.
- * Equivalent to jQuery's offset().
- */
-wax.mm.zoomer.offset = function (element) {
-    'use strict';
-    var coords = { left: 0, top: 0};
-    while (element) {
-        coords.left += element.offsetLeft;
-        coords.top += element.offsetTop;
-        element = element.offsetParent;
-    }
-    return coords;
+    return closest;
 };
