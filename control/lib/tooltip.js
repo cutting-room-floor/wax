@@ -47,13 +47,15 @@ wax.tooltip = function() {
 
     function on(o) {
         var content;
-        if ((o.e.type === 'mousemove' || !o.e.type) && !popped) {
-            content = o.content || o.formatter({ format: 'teaser' }, o.data);
-            if (!content || content == _currentContent) return;
-            hide();
-            parent.style.cursor = 'pointer';
-            tooltips.push(parent.appendChild(getTooltip(content)));
-            _currentContent = content;
+        if (o.e.type === 'mousemove' || !o.e.type) {
+            if (!popped) {
+                content = o.content || o.formatter({ format: 'teaser' }, o.data);
+                if (!content || content == _currentContent) return;
+                hide();
+                parent.style.cursor = 'pointer';
+                tooltips.push(parent.appendChild(getTooltip(content)));
+                _currentContent = content;
+            }
         } else {
             content = o.content || o.formatter({ format: 'full' }, o.data);
             if (!content) {
