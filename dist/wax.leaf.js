@@ -2123,9 +2123,9 @@ wax.gm = function() {
             var xyz = rx.exec(url);
             if (!xyz) return;
             return template[parseInt(xyz[2], 10) % template.length]
-                .replace('{z}', xyz[1])
-                .replace('{x}', xyz[2])
-                .replace('{y}', xyz[3]);
+                .replace(/\{z\}/g, xyz[1])
+                .replace(/\{x\}/g, xyz[2])
+                .replace(/\{y\}/g, xyz[3]);
         };
     }
 
