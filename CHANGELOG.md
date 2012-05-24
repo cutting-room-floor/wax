@@ -1,5 +1,9 @@
 ## Changelog
 
+## 6.0.4
+
+* Use `.content()` instead of `.set()` for wax.g.attribution control
+
 ## 6.0.3
 
 * The template HTML sanitizer now permits the use of

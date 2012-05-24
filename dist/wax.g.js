@@ -1,4 +1,4 @@
-/* wax - 6.0.3 - 1.0.4-571-g6dcc55f */
+/* wax - 6.0.4 - 1.0.4-572-g5e88957 */
 
 
 !function (name, context, definition) {
@@ -3036,7 +3036,7 @@ wax.g.attribution = function(map, tilejson) {
 
     attribution.init = function() {
         a = wax.attribution();
-        a.set(tilejson.attribution);
+        a.content(tilejson.attribution);
         a.element().className = 'wax-attribution wax-g';
         return this;
     };
