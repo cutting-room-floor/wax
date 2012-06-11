@@ -46,18 +46,14 @@ wax.tooltip = function() {
     }
 
     function on(o) {
-        var content;
+        var content = o.content || o.formatter({ format: 'full' }, o.data);
         if (o.e.type === 'mousemove' || !o.e.type) {
-            if (!popped) {
-                content = o.content || o.formatter({ format: 'teaser' }, o.data);
-                if (!content || content == _currentContent) return;
-                hide();
-                parent.style.cursor = 'pointer';
-                tooltips.push(parent.appendChild(getTooltip(content)));
-                _currentContent = content;
+            if (!content || content == _currentContent) {
+                parent.style.cursor = 'default';
+                return;
             }
+            parent.style.cursor = 'pointer';
         } else {
-            content = o.content || o.formatter({ format: 'full' }, o.data);
             if (!content) {
               if (o.e.type && o.e.type.match(/touch/)) {
                 // fallback possible
@@ -67,7 +63,6 @@ wax.tooltip = function() {
               if (!content) return;
             }
             hide();
-            parent.style.cursor = 'pointer';
             var tt = parent.appendChild(getTooltip(content));
             tt.className += ' wax-popup';
 
@@ -76,6 +71,7 @@ wax.tooltip = function() {
             close.className = 'close';
             close.innerHTML = 'Close';
             popped = true;
+            _currentContent = content;
 
             tooltips.push(tt);
 
