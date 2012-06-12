@@ -79,6 +79,10 @@ wax.tooltip = function() {
 
             tooltips.push(tt);
 
+            bean.add(close, 'touchstart mousedown', function(e) {
+                e.stop();
+            });
+
             bean.add(close, 'click touchend', function closeClick(e) {
                 e.stop();
                 hide();

@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <title>b demo</title>
+    <script src='../ext/modestmaps.min.js' type='text/javascript'></script>
+    <script src='../dist/wax.mm.js' type='text/javascript'></script>
+    <link href='../theme/controls.css' rel='stylesheet' type='text/css' />
+
+<style>
+  #map_canvas {
+    position:absolute;
+    width:800px;
+    height:600px;
+  }
+</style>
+  </head>
+  <body>
+    <div id='map_canvas'></div>
+
+    <script type="text/javascript">
+    wax.tilejson('http://c.tiles.mapbox.com/v3/tmcw.map-2sdcp6um.jsonp', function(tilejson) {
+      map = new MM.Map('map_canvas', new wax.mm.connector(tilejson));
+      map.setCenterZoom(new MM.Location(tilejson.center[1], tilejson.center[0]), tilejson.center[2] + 3);
+      inter = wax.mm.interaction()
+          .map(map)
+          .tilejson(tilejson)
+          .on(wax.tooltip().parent(map.parent).animate(true).events());
+    });
+</script>
+  </div>
+</body>
