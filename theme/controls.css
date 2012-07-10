@@ -186,11 +186,3 @@
   bottom:4px;
   background:transparent;
   }
-
-.map-latlngtooltip {
-  position:absolute;
-  background:#caedf4;
-  padding:3px;
-  border:1px solid #75c1d0;
-  border-radius:3px;
-  }
