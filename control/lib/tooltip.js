@@ -20,7 +20,7 @@ wax.tooltip = function() {
     // Hide any tooltips on layers underneath this one.
     function getTooltip(feature) {
         var tooltip = document.createElement('div');
-        tooltip.className = 'wax-tooltip wax-tooltip-0';
+        tooltip.className = 'map-tooltip map-tooltip-0';
         tooltip.innerHTML = feature;
         return tooltip;
     }
@@ -38,7 +38,7 @@ wax.tooltip = function() {
                 // This code assumes that transform-supporting browsers
                 // also support proper events. IE9 does both.
                   bean.add(_ct, transitionEvent, remove);
-                  _ct.className += ' wax-fade';
+                  _ct.className += ' map-fade';
             } else {
                 if (_ct.parentNode) _ct.parentNode.removeChild(_ct);
             }
@@ -69,7 +69,7 @@ wax.tooltip = function() {
             hide();
             parent.style.cursor = 'pointer';
             var tt = parent.appendChild(getTooltip(content));
-            tt.className += ' wax-popup';
+            tt.className += ' map-popup';
 
             var close = tt.appendChild(document.createElement('a'));
             close.href = '#close';

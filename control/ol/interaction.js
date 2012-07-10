@@ -12,7 +12,7 @@ wax.ol.interaction = function() {
             // TODO: make better indication of whether
             // this is an interactive layer
             if ((map.layers[i].visibility === true) &&
-                (map.layers[i].CLASS_NAME === 'Wax.Layer')) {
+                (map.layers[i].CLASS_NAME === 'Map.Layer')) {
               l.push(map.layers[i]);
             }
         }

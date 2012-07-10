@@ -58,7 +58,7 @@ wax.mm.latlngtooltip = function(map) {
         MM.addEvent(map.parent, 'mousedown', onDown);
         MM.addEvent(map.parent, 'mouseup', onUp);
         tt = document.createElement('div');
-        tt.className = 'wax-latlngtooltip';
+        tt.className = 'map-latlngtooltip';
         return this;
     };
 

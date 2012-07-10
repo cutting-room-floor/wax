@@ -69,7 +69,7 @@ wax.mm.pointselector = function(map, tilejson, opts) {
             var point = map.locationPoint(locations[i]);
             if (!locations[i].pointDiv) {
                 locations[i].pointDiv = document.createElement('div');
-                locations[i].pointDiv.className = 'wax-point-div';
+                locations[i].pointDiv.className = 'map-point-div';
                 locations[i].pointDiv.style.position = 'absolute';
                 locations[i].pointDiv.style.display = 'block';
                 // TODO: avoid circular reference

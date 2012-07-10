@@ -1,4 +1,4 @@
-/* wax - 6.4.2 - v6.0.4-31-g769f4ce */
+/* wax - 6.4.2 - v6.0.4-32-g6bfa87a */
 
 
 !function (name, context, definition) {
@@ -2060,7 +2060,7 @@ wax.attribution = function() {
 
     a.init = function() {
         container = document.createElement('div');
-        container.className = 'wax-attribution';
+        container.className = 'map-attribution';
         return this;
     };
 
@@ -2693,10 +2693,10 @@ wax.legend = function() {
 
     legend.add = function() {
         container = document.createElement('div');
-        container.className = 'wax-legends';
+        container.className = 'map-legends';
 
         element = container.appendChild(document.createElement('div'));
-        element.className = 'wax-legend';
+        element.className = 'map-legend';
         element.style.display = 'none';
         return legend;
     };
@@ -2766,7 +2766,7 @@ wax.movetip = function() {
     // Hide any tooltips on layers underneath this one.
     function getTooltip(feature) {
         var tooltip = document.createElement('div');
-        tooltip.className = 'wax-tooltip wax-tooltip-0';
+        tooltip.className = 'map-tooltip map-tooltip-0';
         tooltip.innerHTML = feature;
         return tooltip;
     }
@@ -2793,7 +2793,7 @@ wax.movetip = function() {
             if (!content) return;
             hide();
             var tt = document.body.appendChild(getTooltip(content));
-            tt.className += ' wax-popup';
+            tt.className += ' map-popup';
 
             var close = tt.appendChild(document.createElement('a'));
             close.href = '#close';
@@ -2960,7 +2960,7 @@ wax.tooltip = function() {
     // Hide any tooltips on layers underneath this one.
     function getTooltip(feature) {
         var tooltip = document.createElement('div');
-        tooltip.className = 'wax-tooltip wax-tooltip-0';
+        tooltip.className = 'map-tooltip map-tooltip-0';
         tooltip.innerHTML = feature;
         return tooltip;
     }
@@ -2978,7 +2978,7 @@ wax.tooltip = function() {
                 // This code assumes that transform-supporting browsers
                 // also support proper events. IE9 does both.
                   bean.add(_ct, transitionEvent, remove);
-                  _ct.className += ' wax-fade';
+                  _ct.className += ' map-fade';
             } else {
                 if (_ct.parentNode) _ct.parentNode.removeChild(_ct);
             }
@@ -3009,7 +3009,7 @@ wax.tooltip = function() {
             hide();
             parent.style.cursor = 'pointer';
             var tt = parent.appendChild(getTooltip(content));
-            tt.className += ' wax-popup';
+            tt.className += ' map-popup';
 
             var close = tt.appendChild(document.createElement('a'));
             close.href = '#close';
@@ -3232,7 +3232,7 @@ wax.mm.attribution = function(map, tilejson) {
     attribution.init = function() {
         a = wax.attribution();
         a.content(tilejson.attribution);
-        a.element().className = 'wax-attribution wax-mm';
+        a.element().className = 'map-attribution map-mm';
         return this;
     };
 
@@ -3507,7 +3507,7 @@ wax.mm.fullscreen = function(map) {
     // restore to that size on exit from fullscreen.
     fullscreen.add = function(map) {
         a = document.createElement('a');
-        a.className = 'wax-fullscreen';
+        a.className = 'map-fullscreen';
         a.href = '#fullscreen';
         a.innerHTML = 'fullscreen';
         bean.add(a, 'click', click);
@@ -3516,14 +3516,14 @@ wax.mm.fullscreen = function(map) {
     fullscreen.full = function() {
         if (fullscreened) { return; } else { fullscreened = true; }
         smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
-        map.parent.className += ' wax-fullscreen-map';
-        body.className += ' wax-fullscreen-view';
+        map.parent.className += ' map-fullscreen-map';
+        body.className += ' map-fullscreen-view';
         ss(map.parent.offsetWidth, map.parent.offsetHeight);
     };
     fullscreen.original = function() {
         if (!fullscreened) { return; } else { fullscreened = false; }
-        map.parent.className = map.parent.className.replace(' wax-fullscreen-map', '');
-        body.className = body.className.replace(' wax-fullscreen-view', '');
+        map.parent.className = map.parent.className.replace(' map-fullscreen-map', '');
+        body.className = body.className.replace(' map-fullscreen-view', '');
         ss(smallSize[0], smallSize[1]);
     };
     fullscreen.appendTo = function(elem) {
@@ -3681,7 +3681,7 @@ wax.mm.latlngtooltip = function(map) {
         MM.addEvent(map.parent, 'mousedown', onDown);
         MM.addEvent(map.parent, 'mouseup', onUp);
         tt = document.createElement('div');
-        tt.className = 'wax-latlngtooltip';
+        tt.className = 'map-latlngtooltip';
         return this;
     };
 
@@ -3798,7 +3798,7 @@ wax.mm.pointselector = function(map, tilejson, opts) {
             var point = map.locationPoint(locations[i]);
             if (!locations[i].pointDiv) {
                 locations[i].pointDiv = document.createElement('div');
-                locations[i].pointDiv.className = 'wax-point-div';
+                locations[i].pointDiv.className = 'map-point-div';
                 locations[i].pointDiv.style.position = 'absolute';
                 locations[i].pointDiv.style.display = 'block';
                 // TODO: avoid circular reference

@@ -19,11 +19,11 @@ describe('attribution', function() {
     });
 
     it('can have its content set', function() {
-        expect($('.wax-attribution', map.parent).text()).toEqual('42');
+        expect($('.map-attribution', map.parent).text()).toEqual('42');
     });
 
     it('returns its element', function() {
-        expect(attribution.element()).toEqual($('.wax-attribution', map.parent)[0]);
+        expect(attribution.element()).toEqual($('.map-attribution', map.parent)[0]);
     });
 
     it('can be appended to an element', function() {

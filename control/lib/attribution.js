@@ -33,7 +33,7 @@ wax.attribution = function() {
 
     a.init = function() {
         container = document.createElement('div');
-        container.className = 'wax-attribution';
+        container.className = 'map-attribution';
         return this;
     };
 

@@ -1,4 +1,4 @@
-/* wax - 6.4.2 - v6.0.4-31-g769f4ce */
+/* wax - 6.4.2 - v6.0.4-32-g6bfa87a */
 
 
 !function (name, context, definition) {
@@ -2060,7 +2060,7 @@ wax.attribution = function() {
 
     a.init = function() {
         container = document.createElement('div');
-        container.className = 'wax-attribution';
+        container.className = 'map-attribution';
         return this;
     };
 
@@ -2693,10 +2693,10 @@ wax.legend = function() {
 
     legend.add = function() {
         container = document.createElement('div');
-        container.className = 'wax-legends';
+        container.className = 'map-legends';
 
         element = container.appendChild(document.createElement('div'));
-        element.className = 'wax-legend';
+        element.className = 'map-legend';
         element.style.display = 'none';
         return legend;
     };
@@ -2766,7 +2766,7 @@ wax.movetip = function() {
     // Hide any tooltips on layers underneath this one.
     function getTooltip(feature) {
         var tooltip = document.createElement('div');
-        tooltip.className = 'wax-tooltip wax-tooltip-0';
+        tooltip.className = 'map-tooltip map-tooltip-0';
         tooltip.innerHTML = feature;
         return tooltip;
     }
@@ -2793,7 +2793,7 @@ wax.movetip = function() {
             if (!content) return;
             hide();
             var tt = document.body.appendChild(getTooltip(content));
-            tt.className += ' wax-popup';
+            tt.className += ' map-popup';
 
             var close = tt.appendChild(document.createElement('a'));
             close.href = '#close';
@@ -2960,7 +2960,7 @@ wax.tooltip = function() {
     // Hide any tooltips on layers underneath this one.
     function getTooltip(feature) {
         var tooltip = document.createElement('div');
-        tooltip.className = 'wax-tooltip wax-tooltip-0';
+        tooltip.className = 'map-tooltip map-tooltip-0';
         tooltip.innerHTML = feature;
         return tooltip;
     }
@@ -2978,7 +2978,7 @@ wax.tooltip = function() {
                 // This code assumes that transform-supporting browsers
                 // also support proper events. IE9 does both.
                   bean.add(_ct, transitionEvent, remove);
-                  _ct.className += ' wax-fade';
+                  _ct.className += ' map-fade';
             } else {
                 if (_ct.parentNode) _ct.parentNode.removeChild(_ct);
             }
@@ -3009,7 +3009,7 @@ wax.tooltip = function() {
             hide();
             parent.style.cursor = 'pointer';
             var tt = parent.appendChild(getTooltip(content));
-            tt.className += ' wax-popup';
+            tt.className += ' map-popup';
 
             var close = tt.appendChild(document.createElement('a'));
             close.href = '#close';
@@ -3232,7 +3232,7 @@ wax.g.attribution = function(map, tilejson) {
     attribution.init = function() {
         a = wax.attribution();
         a.content(tilejson.attribution);
-        a.element().className = 'wax-attribution wax-g';
+        a.element().className = 'map-attribution map-g';
         return this;
     };
 

@@ -34,7 +34,7 @@ wax.movetip = function() {
     // Hide any tooltips on layers underneath this one.
     function getTooltip(feature) {
         var tooltip = document.createElement('div');
-        tooltip.className = 'wax-tooltip wax-tooltip-0';
+        tooltip.className = 'map-tooltip map-tooltip-0';
         tooltip.innerHTML = feature;
         return tooltip;
     }
@@ -61,7 +61,7 @@ wax.movetip = function() {
             if (!content) return;
             hide();
             var tt = document.body.appendChild(getTooltip(content));
-            tt.className += ' wax-popup';
+            tt.className += ' map-popup';
 
             var close = tt.appendChild(document.createElement('a'));
             close.href = '#close';

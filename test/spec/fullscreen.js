@@ -14,14 +14,14 @@ describe('fullscreen', function() {
     });
 
     it('makes the map fullscreen', function() {
-        $('.wax-fullscreen', map.parent).click();
-        expect($(map.parent).hasClass('wax-fullscreen-map')).toEqual(true);
+        $('.map-fullscreen', map.parent).click();
+        expect($(map.parent).hasClass('map-fullscreen-map')).toEqual(true);
     });
 
     it('can toggle fullscreen', function() {
-        $('.wax-fullscreen', map.parent).click();
-        expect($(map.parent).hasClass('wax-fullscreen-map')).toEqual(true);
-        $('.wax-fullscreen', map.parent).click();
-        expect($(map.parent).hasClass('wax-fullscreen-map')).toEqual(false);
+        $('.map-fullscreen', map.parent).click();
+        expect($(map.parent).hasClass('map-fullscreen-map')).toEqual(true);
+        $('.map-fullscreen', map.parent).click();
+        expect($(map.parent).hasClass('map-fullscreen-map')).toEqual(false);
     });
 });

@@ -5,7 +5,7 @@
 wax.ol = wax.ol || {};
 
 wax.ol.Legend = OpenLayers.Class(OpenLayers.Control, {
-    CLASS_NAME: 'wax.ol.Legend',
+    CLASS_NAME: 'map.ol.Legend',
     legend: null,
     options: null,
 

@@ -38,7 +38,7 @@ wax.mm.fullscreen = function(map) {
     // restore to that size on exit from fullscreen.
     fullscreen.add = function(map) {
         a = document.createElement('a');
-        a.className = 'wax-fullscreen';
+        a.className = 'map-fullscreen';
         a.href = '#fullscreen';
         a.innerHTML = 'fullscreen';
         bean.add(a, 'click', click);
@@ -47,14 +47,14 @@ wax.mm.fullscreen = function(map) {
     fullscreen.full = function() {
         if (fullscreened) { return; } else { fullscreened = true; }
         smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
-        map.parent.className += ' wax-fullscreen-map';
-        body.className += ' wax-fullscreen-view';
+        map.parent.className += ' map-fullscreen-map';
+        body.className += ' map-fullscreen-view';
         ss(map.parent.offsetWidth, map.parent.offsetHeight);
     };
     fullscreen.original = function() {
         if (!fullscreened) { return; } else { fullscreened = false; }
-        map.parent.className = map.parent.className.replace(' wax-fullscreen-map', '');
-        body.className = body.className.replace(' wax-fullscreen-view', '');
+        map.parent.className = map.parent.className.replace(' map-fullscreen-map', '');
+        body.className = body.className.replace(' map-fullscreen-view', '');
         ss(smallSize[0], smallSize[1]);
     };
     fullscreen.appendTo = function(elem) {

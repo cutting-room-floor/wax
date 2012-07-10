@@ -21,7 +21,7 @@ wax.mm.attribution = function(map, tilejson) {
     attribution.init = function() {
         a = wax.attribution();
         a.content(tilejson.attribution);
-        a.element().className = 'wax-attribution wax-mm';
+        a.element().className = 'map-attribution map-mm';
         return this;
     };
 
