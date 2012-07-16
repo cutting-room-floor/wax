@@ -2476,6 +2476,7 @@ wax.interaction = function() {
         _d = wax.u.eventoffset(e);
         if (e.type === 'mousedown') {
             bean.add(document.body, 'click', onUp);
+            bean.add(document.body, 'mouseup', onUp);
 
         // Only track single-touches. Double-touches will not affect this
         // control
@@ -3114,15 +3115,9 @@ wax.u = {
             };
         } else if (e.clientX || e.clientY) {
             // Internet Explorer
-            var doc = document.documentElement, body = document.body;
-            var htmlComputed = document.body.parentNode.currentStyle;
-            var topMargin = parseInt(htmlComputed.marginTop, 10) || 0;
-            var leftMargin = parseInt(htmlComputed.marginLeft, 10) || 0;
             return {
-                x: e.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
-                    (doc && doc.clientLeft || body && body.clientLeft || 0) + leftMargin,
-                y: e.clientY + (doc && doc.scrollTop  || body && body.scrollTop  || 0) -
-                    (doc && doc.clientTop  || body && body.clientTop  || 0) + topMargin
+                x: e.clientX,
+                y: e.clientY
             };
         } else if (e.touches && e.touches.length === 1) {
             // Touch browsers
