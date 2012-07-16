@@ -2476,6 +2476,7 @@ wax.interaction = function() {
         _d = wax.u.eventoffset(e);
         if (e.type === 'mousedown') {
             bean.add(document.body, 'click', onUp);
+            bean.add(document.body, 'mouseup', onUp);
 
         // Only track single-touches. Double-touches will not affect this
         // control
