@@ -9,11 +9,17 @@ wax.mm.interaction = function() {
             'extentset', 'resized', 'drawn'];
 
     function grid() {
-        var zoomLayer = map.getLayerAt(0)
-            .levels[Math.round(map.getZoom())];
         if (!dirty && _grid !== undefined && _grid.length) {
             return _grid;
         } else {
+            var tiles;
+            for (var i = 0; i < map.getLayers().length; i++) {
+                var zoomLayer = map.getLayerAt(i).levels[Math.round(map.zoom())];
+                if (zoomLayer !== undefined) {
+                    tiles = map.getLayerAt(i).tileElementsInLevel(zoomLayer);
+                    if (tiles.length) break;
+                }
+            }
             _grid = (function(t) {
                 var o = [];
                 for (var key in t) {
@@ -27,7 +33,7 @@ wax.mm.interaction = function() {
                     }
                 }
                 return o;
-            })(map.getLayerAt(0).tiles);
+            })(tiles);
             return _grid;
         }
     }
