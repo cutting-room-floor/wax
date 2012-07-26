@@ -14,7 +14,8 @@ wax.mm.interaction = function() {
         } else {
             var tiles;
             for (var i = 0; i < map.getLayers().length; i++) {
-                var zoomLayer = map.getLayerAt(i).levels[Math.round(map.zoom())];
+                var levels = map.getLayerAt(i).levels;
+                var zoomLayer = levels && levels[Math.round(map.zoom())];
                 if (zoomLayer !== undefined) {
                     tiles = map.getLayerAt(i).tileElementsInLevel(zoomLayer);
                     if (tiles.length) break;
