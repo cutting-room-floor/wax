@@ -34,10 +34,11 @@ wax.interaction = function() {
     function getTile(e) {
         var g = grid();
         for (var i = 0; i < g.length; i++) {
-            if ((g[i][0] < e.y) &&
-               ((g[i][0] + 256) > e.y) &&
-                (g[i][1] < e.x) &&
-               ((g[i][1] + 256) > e.x)) return g[i][2];
+            if (e)
+                if ((g[i][0] < e.y) &&
+                   ((g[i][0] + 256) > e.y) &&
+                    (g[i][1] < e.x) &&
+                   ((g[i][1] + 256) > e.x)) return g[i][2];
         }
         return false;
     }
