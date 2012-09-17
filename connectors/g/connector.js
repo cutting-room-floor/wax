@@ -75,7 +75,7 @@ wax.g.connector.prototype.getTileUrl = function(coord, z) {
     return this.options.tiles
         [parseInt(x + y, 10) %
             this.options.tiles.length]
-                .replace('{z}', z)
-                .replace('{x}', x)
-                .replace('{y}', y);
+                .replace(/\{z\}/g, z)
+                .replace(/\{x\}/g, x)
+                .replace(/\{y\}/g, y);
 };
