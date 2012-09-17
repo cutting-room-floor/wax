@@ -24,6 +24,7 @@ wax.g.connector = function(options) {
         blankImage: options.blankImage || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
     };
 
+    this.opacity = options.opacity || 0;
     this.minZoom = options.minzoom || 0;
     this.maxZoom = options.maxzoom || 22;
 
@@ -45,6 +46,7 @@ wax.g.connector.prototype.getTile = function(coord, zoom, ownerDocument) {
         var img = this.cache[key] = new Image(256, 256);
         this.cache[key].src = this.getTileUrl(coord, zoom);
         this.cache[key].setAttribute('gTileKey', key);
+        this.cache[key].setAttribute("style","opacity: "+this.opacity+"; filter: alpha(opacity="+(this.opacity*100)+");");
         this.cache[key].onerror = function() { img.style.display = 'none'; };
     }
     return this.cache[key];
