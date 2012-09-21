@@ -10,7 +10,7 @@ wax.location = function() {
         } else {
             var loc = o.formatter({ format: 'location' }, o.data);
             if (loc) {
-                window.location.href = loc;
+                window.top.location.href = loc;
             }
         }
     }
