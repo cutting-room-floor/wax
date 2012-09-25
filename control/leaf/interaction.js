@@ -21,8 +21,12 @@ wax.leaf.interaction = function() {
                     // This only supports tiled layers
                     if (layers[layerId]._tiles) {
                         for (var tile in layers[layerId]._tiles) {
-                            var offset = wax.u.offset(layers[layerId]._tiles[tile]);
-                            o.push([offset.top, offset.left, layers[layerId]._tiles[tile]]);
+                            var _tile = layers[layerId]._tiles[tile];
+                            // avoid adding tiles without src, grid url can't be found for them
+                            if(_tile.src) {
+                              var offset = wax.u.offset(_tile);
+                              o.push([offset.top, offset.left, _tile]);
+                            }
                         }
                     }
                 }
