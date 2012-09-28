@@ -45,12 +45,18 @@ wax.u = {
             }
         };
 
-        calculateOffset(el);
-
-        try {
-            while (el = el.offsetParent) { calculateOffset(el); }
-        } catch(e) {
-            // Hello, internet explorer.
+        // from jquery, offset.js
+        if ( typeof el.getBoundingClientRect !== "undefined" ) {
+          var box = el.getBoundingClientRect();
+          top = box.top;
+          left = box.left;
+        } else {
+          calculateOffset(el);
+          try {
+              while (el = el.offsetParent) { calculateOffset(el); }
+          } catch(e) {
+              // Hello, internet explorer.
+          }
         }
 
         // Offsets from the body
