@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev10 - v6.0.4-99-gbe8ba88 */
+/* wax - 7.0.0dev10 - v6.0.4-109-g87308e1 */
 
 
 !function (name, context, definition) {
@@ -2390,7 +2390,7 @@ wax.interaction = function() {
     var gm = wax.gm(),
         interaction = {},
         _downLock = false,
-        _clickTimeout = false,
+        _clickTimeout = null,
         // Active feature
         // Down event
         _d,
@@ -2420,10 +2420,11 @@ wax.interaction = function() {
     function getTile(e) {
         var g = grid();
         for (var i = 0; i < g.length; i++) {
-            if ((g[i][0] < e.y) &&
-               ((g[i][0] + 256) > e.y) &&
-                (g[i][1] < e.x) &&
-               ((g[i][1] + 256) > e.x)) return g[i][2];
+            if (e)
+                if ((g[i][0] < e.y) &&
+                   ((g[i][0] + 256) > e.y) &&
+                    (g[i][1] < e.x) &&
+                   ((g[i][1] + 256) > e.x)) return g[i][2];
         }
         return false;
     }
@@ -2463,9 +2464,6 @@ wax.interaction = function() {
 
     // A handler for 'down' events - which means `mousedown` and `touchstart`
     function onDown(e) {
-        // Ignore double-clicks by ignoring clicks within 300ms of
-        // each other.
-        if (killTimeout()) { return; }
 
         // Prevent interaction offset calculations happening while
         // the user is dragging the map.
@@ -2476,7 +2474,8 @@ wax.interaction = function() {
         _d = wax.u.eventoffset(e);
         if (e.type === 'mousedown') {
             bean.add(document.body, 'click', onUp);
-            bean.add(document.body, 'mouseup', onUp);
+            // track mouse up to remove lockDown when the drags end
+            bean.add(document.body, 'mouseup', dragEnd);
 
         // Only track single-touches. Double-touches will not affect this
         // control
@@ -2486,6 +2485,10 @@ wax.interaction = function() {
             // Touch moves invalidate touches
             bean.add(parent(), touchEnds);
         }
+    }
+
+    function dragEnd() {
+        _downLock = false;
     }
 
     function touchCancel() {
@@ -2514,11 +2517,16 @@ wax.interaction = function() {
         } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
             Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
             // Contain the event data in a closure.
-            _clickTimeout = window.setTimeout(
-                function() {
-                    _clickTimeout = null;
-                    interaction.click(evt, pos);
-                }, 300);
+            // Ignore double-clicks by ignoring clicks within 300ms of
+            // each other.
+            if(!_clickTimeout) {
+              _clickTimeout = window.setTimeout(function() {
+                  _clickTimeout = null;
+                  interaction.click(evt, pos);
+              }, 300);
+            } else {
+              killTimeout();
+            }
         }
         return onUp;
     }
@@ -3049,12 +3057,18 @@ wax.u = {
             }
         };
 
-        calculateOffset(el);
-
-        try {
-            while (el = el.offsetParent) { calculateOffset(el); }
-        } catch(e) {
-            // Hello, internet explorer.
+        // from jquery, offset.js
+        if ( typeof el.getBoundingClientRect !== "undefined" ) {
+          var box = el.getBoundingClientRect();
+          top = box.top;
+          left = box.left;
+        } else {
+          calculateOffset(el);
+          try {
+              while (el = el.offsetParent) { calculateOffset(el); }
+          } catch(e) {
+              // Hello, internet explorer.
+          }
         }
 
         // Offsets from the body
@@ -3363,6 +3377,7 @@ wax.g.connector = function(options) {
         blankImage: options.blankImage || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
     };
 
+    this.opacity = options.opacity || 0;
     this.minZoom = options.minzoom || 0;
     this.maxZoom = options.maxzoom || 22;
 
@@ -3384,6 +3399,7 @@ wax.g.connector.prototype.getTile = function(coord, zoom, ownerDocument) {
         var img = this.cache[key] = new Image(256, 256);
         this.cache[key].src = this.getTileUrl(coord, zoom);
         this.cache[key].setAttribute('gTileKey', key);
+        this.cache[key].setAttribute("style","opacity: "+this.opacity+"; filter: alpha(opacity="+(this.opacity*100)+");");
         this.cache[key].onerror = function() { img.style.display = 'none'; };
     }
     return this.cache[key];
@@ -3414,7 +3430,7 @@ wax.g.connector.prototype.getTileUrl = function(coord, z) {
     return this.options.tiles
         [parseInt(x + y, 10) %
             this.options.tiles.length]
-                .replace('{z}', z)
-                .replace('{x}', x)
-                .replace('{y}', y);
+                .replace(/\{z\}/g, z)
+                .replace(/\{x\}/g, x)
+                .replace(/\{y\}/g, y);
 };
