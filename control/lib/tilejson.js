@@ -6,7 +6,7 @@ wax.tilejson = function(url, callback) {
         url: url + (~url.indexOf('?') ? '&' : '?') + 'callback=grid',
         type: 'jsonp',
         jsonpCallback: 'callback',
-        success: callback,
+        success: function(resp) { callback(null, resp); },
         error: callback
     });
 };
