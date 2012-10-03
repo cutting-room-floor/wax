@@ -10,71 +10,34 @@ wax.u = {
         // Okay, so fall back to styles if offsetWidth and height are botched
         // by Firefox.
         var width = el.offsetWidth || parseInt(el.style.width, 10),
-            height = el.offsetHeight || parseInt(el.style.height, 10),
-            doc_body = document.body,
-            top = 0,
-            left = 0;
+            height = el.offsetHeight || parseInt(el.style.height, 10);
 
-        var calculateOffset = function(el) {
-            if (el === doc_body || el === document.documentElement) return;
-            top += el.offsetTop;
-            left += el.offsetLeft;
+        // from jquery, offset.js
+        var docElem, body, win, clientTop, clientLeft, scrollTop, scrollLeft,
+            box = { top: 0, left: 0 },
+            doc = el && el.ownerDocument;
 
-            var style = el.style.transform ||
-                el.style.WebkitTransform ||
-                el.style.OTransform ||
-                el.style.MozTransform ||
-                el.style.msTransform;
-
-            if (style) {
-                var match;
-                if (match = style.match(/translate\((.+)px, (.+)px\)/)) {
-                    top += parseInt(match[2], 10);
-                    left += parseInt(match[1], 10);
-                } else if (match = style.match(/translate3d\((.+)px, (.+)px, (.+)px\)/)) {
-                    top += parseInt(match[2], 10);
-                    left += parseInt(match[1], 10);
-                } else if (match = style.match(/matrix3d\(([\-\d,\s]+)\)/)) {
-                    var pts = match[1].split(',');
-                    top += parseInt(pts[13], 10);
-                    left += parseInt(pts[12], 10);
-                } else if (match = style.match(/matrix\(.+, .+, .+, .+, (.+), (.+)\)/)) {
-                    top += parseInt(match[2], 10);
-                    left += parseInt(match[1], 10);
-                }
-            }
-        };
-
-        calculateOffset(el);
-
-        try {
-            while (el = el.offsetParent) { calculateOffset(el); }
-        } catch(e) {
-            // Hello, internet explorer.
+        if ( !doc ) {
+            return;
         }
 
-        // Offsets from the body
-        top += doc_body.offsetTop;
-        left += doc_body.offsetLeft;
-        // Offsets from the HTML element
-        top += doc_body.parentNode.offsetTop;
-        left += doc_body.parentNode.offsetLeft;
+        body = doc.body;
+        docElem = doc.documentElement;
 
-        // Firefox and other weirdos. Similar technique to jQuery's
-        // `doesNotIncludeMarginInBodyOffset`.
-        var htmlComputed = document.defaultView ?
-            window.getComputedStyle(doc_body.parentNode, null) :
-            doc_body.parentNode.currentStyle;
-        if (doc_body.parentNode.offsetTop !==
-            parseInt(htmlComputed.marginTop, 10) &&
-            !isNaN(parseInt(htmlComputed.marginTop, 10))) {
-            top += parseInt(htmlComputed.marginTop, 10);
-            left += parseInt(htmlComputed.marginLeft, 10);
+        // If we don't have gBCR, just use 0,0 rather than error
+        // BlackBerry 5, iOS 3 (original iPhone)
+        if ( typeof el.getBoundingClientRect !== "undefined" ) {
+            box = el.getBoundingClientRect();
         }
+        win = window;
+        clientTop  = docElem.clientTop  || body.clientTop  || 0;
+        clientLeft = docElem.clientLeft || body.clientLeft || 0;
+        scrollTop  = win.pageYOffset || docElem.scrollTop;
+        scrollLeft = win.pageXOffset || docElem.scrollLeft;
 
         return {
-            top: top,
-            left: left,
+            top: box.top  + scrollTop  - clientTop,
+            left: box.left + scrollLeft - clientLeft,
             height: height,
             width: width
         };
