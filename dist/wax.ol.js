@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev10 - v6.0.4-109-g87308e1 */
+/* wax - 7.0.0dev10 - v6.0.4-112-g94e91cb */
 
 
 !function (name, context, definition) {
@@ -3080,9 +3080,17 @@ wax.u = {
 
         // from jquery, offset.js
         if ( typeof el.getBoundingClientRect !== "undefined" ) {
+          var body = document.body;
+          var doc = el.ownerDocument.documentElement;
+          var clientTop  = document.clientTop  || body.clientTop  || 0;
+          var clientLeft = document.clientLeft || body.clientLeft || 0;
+          var scrollTop  = window.pageYOffset || doc.scrollTop;
+          var scrollLeft = window.pageXOffset || doc.scrollLeft;
+
           var box = el.getBoundingClientRect();
-          top = box.top;
-          left = box.left;
+          top = box.top + scrollTop  - clientTop;
+          left = box.left + scrollLeft - clientLeft;
+
         } else {
           calculateOffset(el);
           try {
