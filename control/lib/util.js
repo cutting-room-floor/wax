@@ -28,10 +28,10 @@ wax.u = {
 
             if (style) {
                 var match;
-                if (match = style.match(/translate\((.+)px, (.+)px\)/)) {
+                if (match = style.match(/translate\((.+)[px]?, (.+)[px]?\)/)) {
                     top += parseInt(match[2], 10);
                     left += parseInt(match[1], 10);
-                } else if (match = style.match(/translate3d\((.+)px, (.+)px, (.+)px\)/)) {
+                } else if (match = style.match(/translate3d\((.+)[px]?, (.+)[px]?, (.+)[px]?\)/)) {
                     top += parseInt(match[2], 10);
                     left += parseInt(match[1], 10);
                 } else if (match = style.match(/matrix3d\(([\-\d,\s]+)\)/)) {
