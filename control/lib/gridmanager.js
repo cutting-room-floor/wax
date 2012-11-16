@@ -39,7 +39,7 @@ wax.gm = function() {
       // remove from the url all the special characters
       // replacing them by a dot (dont mind the character)
       tileTemplate = tileTemplate.
-                        replace(/[\/\?\$\*\+\^]/g,'.')
+                        replace(/[\(\)\?\$\*\+\^]/g,'.')
 
       // replace the first {x}{y}{z} by (\\d+)
       return tileTemplate
