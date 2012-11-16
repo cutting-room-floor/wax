@@ -33,12 +33,17 @@ wax.interaction = function() {
     // grid[ [x, y, tile] ] structure.
     function getTile(e) {
         var g = grid();
+        var regExp = new RegExp(gm.tileRegexp());
         for (var i = 0; i < g.length; i++) {
-            if (e)
-                if ((g[i][0] < e.y) &&
-                   ((g[i][0] + 256) > e.y) &&
-                    (g[i][1] < e.x) &&
-                   ((g[i][1] + 256) > e.x)) return g[i][2];
+            if (e) {
+                var isInside = ((g[i][0] < e.y) &&
+                     ((g[i][0] + 256) > e.y) &&
+                      (g[i][1] < e.x) &&
+                     ((g[i][1] + 256) > e.x));
+                if(isInside && regExp.exec(g[i][2].src)) {
+                    return g[i][2];
+                }
+            }
         }
         return false;
     }

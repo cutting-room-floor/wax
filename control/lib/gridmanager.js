@@ -23,7 +23,7 @@ wax.gm = function() {
         if (typeof template === 'string') template = [template];
         return function templatedGridFinder(url) {
             if (!url) return;
-            var rx = new RegExp('/(\\d+)\\/(\\d+)\\/(\\d+)\\.[\\w\\._]+');
+            var rx = new RegExp(manager.tileRegexp())
             var xyz = rx.exec(url);
             if (!xyz) return;
             return template[parseInt(xyz[2], 10) % template.length]
@@ -31,6 +31,21 @@ wax.gm = function() {
                 .replace(/\{x\}/g, xyz[2])
                 .replace(/\{y\}/g, xyz[3]);
         };
+    }
+
+    // return the regexp to catch the tile number given the url
+    manager.tileRegexp = function() {
+      var tileTemplate = tilejson.tiles[0];
+      // remove from the url all the special characters
+      // replacing them by a dot (dont mind the character)
+      tileTemplate = tileTemplate.
+                        replace(/[\/\?\$\*\+\^]/g,'.')
+
+      // replace the first {x}{y}{z} by (\\d+)
+      return tileTemplate
+        .replace(/\{x\}/,'(\\d+)')
+        .replace(/\{y\}/,'(\\d+)')
+        .replace(/\{z\}/,'(\\d+)')
     }
 
     manager.formatter = function(x) {
