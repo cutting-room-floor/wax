@@ -142,7 +142,7 @@ wax.interaction = function() {
               _clickTimeout = window.setTimeout(function() {
                   _clickTimeout = null;
                   interaction.click(evt, pos);
-              }, 300);
+              }, 150);
             } else {
               killTimeout();
             }
