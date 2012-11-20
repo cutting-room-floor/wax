@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev10 - v6.0.4-122-gbd99baa */
+/* wax - 7.0.0dev10 - v6.0.4-124-g4fcec4d */
 
 
 !function (name, context, definition) {
@@ -2290,9 +2290,9 @@ wax.gm = function() {
       // the browser removes the port in the case it matchs with
       // the default port of the protocol
       if(tileTemplate.indexOf('https') === 0) {
-        tileTemplate.replace(':443', '....')
+        tileTemplate = tileTemplate.replace(':443', '[:0-9]*')
       } else if(tileTemplate.indexOf('http') === 0) {
-        tileTemplate.replace(':80', '...')
+        tileTemplate = tileTemplate.replace(':80', '[:0-9]*')
       }
 
       // replace the first {x}{y}{z} by (\\d+)
