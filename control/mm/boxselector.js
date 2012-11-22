@@ -15,7 +15,7 @@ wax.mm.boxselector = function() {
         box,
         boxselector = {},
         map,
-        callbackManger = new MM.CallbackManager(boxselector, ['change']);
+        callbackManager = new MM.CallbackManager(boxselector, ['change']);
 
     function getMousePoint(e) {
         // start with just the mouse (x, y)
