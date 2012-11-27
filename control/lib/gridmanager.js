@@ -49,8 +49,22 @@ wax.gm = function() {
         tileTemplate = tileTemplate.replace(':80', '[:0-9]*')
       }
 
+      var r = '';
+      if(tilejson.tiles.length > 1) {
+        var t0 = tilejson.tiles[0];
+        var t1 = tilejson.tiles[1];
+        //search characters where differs
+        for(var i = 0; i < t0.length; ++i) {
+          if(t0[i] != t1[i]) {
+            r += '.';
+          } else {
+            r += tileTemplate[i];
+          }
+        }
+      }
+
       // replace the first {x}{y}{z} by (\\d+)
-      return tileTemplate
+      return r
         .replace(/\{x\}/,'(\\d+)')
         .replace(/\{y\}/,'(\\d+)')
         .replace(/\{z\}/,'(\\d+)')
