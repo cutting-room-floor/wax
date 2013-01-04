@@ -24,7 +24,7 @@ wax.mm.interaction = function() {
             _grid = (function(t) {
                 var o = [];
                 for (var key in t) {
-                    if (t[key].parentNode === zoomLayer) {
+                    if (t.hasOwnProperty(key) && t[key].parentNode === zoomLayer) {
                         var offset = wax.u.offset(t[key]);
                         o.push([
                             offset.top,
