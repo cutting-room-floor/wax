@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev13 - v6.0.4-139-g018e17b */
+/* wax - 7.0.0dev13 - v6.0.4-142-ga157a2d */
 
 
 !function (name, context, definition) {
@@ -3699,7 +3699,7 @@ wax.mm.interaction = function() {
             _grid = (function(t) {
                 var o = [];
                 for (var key in t) {
-                    if (t[key].parentNode === zoomLayer) {
+                    if (t.hasOwnProperty(key) && t[key].parentNode === zoomLayer) {
                         var offset = wax.u.offset(t[key]);
                         o.push([
                             offset.top,
