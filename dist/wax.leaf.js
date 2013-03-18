@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev10 - v6.0.4-132-g86c33ce */
+/* wax - 7.0.0dev10 - v6.0.4-133-g57c8e4a */
 
 
 !function (name, context, definition) {
@@ -2466,9 +2466,9 @@ wax.interaction = function() {
         var regExp = new RegExp(gm.tileRegexp());
         for (var i = 0; i < g.length; i++) {
             if (e) {
-                var isInside = ((g[i][0] < e.y) &&
+                var isInside = ((g[i][0] <= e.y) &&
                      ((g[i][0] + 256) > e.y) &&
-                      (g[i][1] < e.x) &&
+                      (g[i][1] <= e.x) &&
                      ((g[i][1] + 256) > e.x));
                 if(isInside && regExp.exec(g[i][2].src)) {
                     return g[i][2];
