@@ -103,7 +103,13 @@ wax.interaction = function() {
             bean.fire(interaction, 'off');
             // Touch moves invalidate touches
             bean.add(parent(), touchEnds);
+        } else if (e.originalEvent.type === "MSPointerDown") {
+          // Don't make the user click close if they hit another tooltip
+            bean.fire(interaction, 'off');
+            // Touch moves invalidate touches
+            bean.add(parent(), pointerEnds);
         }
+
     }
 
     function dragEnd() {
@@ -133,6 +139,8 @@ wax.interaction = function() {
             // but also wax.u.eventoffset will have failed, since this touch
             // event doesn't have coordinates
             interaction.click(e, _d);
+        } else if (e.originalEvent.type === "MSPointerMove" || e.originalEvent.type === "MSPointerUp") {
+            interaction.click(evt, pos);
         } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
             Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
             // Contain the event data in a closure.
