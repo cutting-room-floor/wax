@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev10 - v6.0.4-135-g47f8d15 */
+/* wax - 7.0.0dev10 - v6.0.4-143-g006af88 */
 
 
 !function (name, context, definition) {
@@ -46,6 +46,8 @@
             'input invalid ' +                                                 // form elements
             'touchstart touchmove touchend touchcancel ' +                     // touch
             'gesturestart gesturechange gestureend ' +                         // gesture
+            'MSPointerUp MSPointerDown MSPointerCancel MSPointerMove ' +       // MS Pointer events
+            'MSPointerOver MSPointerOut ' +                                    // MS Pointer events
             'message readystatechange pageshow pagehide popstate ' +           // window
             'hashchange offline online ' +                                     // window
             'afterprint beforeprint ' +                                        // printing
@@ -2127,6 +2129,7 @@ var Mustache = (typeof module !== "undefined" && module.exports) || {};
       , script = doc.createElement('script')
       , loaded = 0
       , isIE10 = navigator.userAgent.indexOf('MSIE 10.0') !== -1
+      , isIE9 = navigator.userAgent.indexOf('MSIE 9.0') !== -1;
 
     if (match) {
       if (match[3] === '?') {
@@ -2143,7 +2146,7 @@ var Mustache = (typeof module !== "undefined" && module.exports) || {};
     script.type = 'text/javascript'
     script.src = url
     script.async = true
-    if (typeof script.onreadystatechange !== 'undefined' && !isIE10) {
+    if (typeof script.onreadystatechange !== 'undefined' && !isIE10 && !isIE9) {
       // need this for IE due to out-of-order onreadystatechange(), binding script
       // execution to an event listener gives us control over when the script
       // is executed. See http://jaubourg.net/2010/07/loading-script-as-onclick-handler-of.html
@@ -2969,6 +2972,12 @@ wax.interaction = function() {
         touchcancel: touchCancel
     };
 
+    var pointerEnds = {
+        MSPointerUp: onUp,
+        MSPointerMove: onUp,
+        MSPointerCancel: touchCancel
+    };
+
     // Abstract getTile method. Depends on a tilegrid with
     // grid[ [x, y, tile] ] structure.
     function getTile(e) {
@@ -2976,9 +2985,9 @@ wax.interaction = function() {
         var regExp = new RegExp(gm.tileRegexp());
         for (var i = 0; i < g.length; i++) {
             if (e) {
-                var isInside = ((g[i][0] < e.y) &&
+                var isInside = ((g[i][0] <= e.y) &&
                      ((g[i][0] + 256) > e.y) &&
-                      (g[i][1] < e.x) &&
+                      (g[i][1] <= e.x) &&
                      ((g[i][1] + 256) > e.x));
                 if(isInside && regExp.exec(g[i][2].src)) {
                     return g[i][2];
@@ -3043,7 +3052,7 @@ wax.interaction = function() {
             bean.fire(interaction, 'off');
             // Touch moves invalidate touches
             bean.add(parent(), touchEnds);
-        } else if (e.originalEvent.type === "MSPointerDown") {
+        } else if (e.originalEvent.type === "MSPointerDown" && e.originalEvent.touches.length === 1) {
           // Don't make the user click close if they hit another tooltip
             bean.fire(interaction, 'off');
             // Touch moves invalidate touches
@@ -3058,28 +3067,31 @@ wax.interaction = function() {
 
     function touchCancel() {
         bean.remove(parent(), touchEnds);
+        bean.remove(parent(), pointerEnds);
         _downLock = false;
     }
 
     function onUp(e) {
         var evt = {},
-            pos = wax.u.eventoffset(e);
+            pos = wax.u.eventoffset(e.originalEvent);
         _downLock = false;
 
-        // TODO: refine
-        for (var key in e) {
-          evt[key] = e[key];
+        for (var key in e.originalEvent) {
+          evt[key] = e.originalEvent[key];
         }
+
+        evt.changedTouches = [];
 
         bean.remove(document.body, 'mouseup', onUp);
         bean.remove(parent(), touchEnds);
+        bean.remove(parent(), pointerEnds);
 
         if (e.type === 'touchend') {
             // If this was a touch and it survived, there's no need to avoid a double-tap
             // but also wax.u.eventoffset will have failed, since this touch
             // event doesn't have coordinates
             interaction.click(e, _d);
-        } else if (e.originalEvent.type === "MSPointerMove" || e.originalEvent.type === "MSPointerUp") {
+        } else if (evt.type === "MSPointerMove" || evt.type === "MSPointerUp") {
             interaction.click(evt, pos);
         } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
             Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
@@ -3141,6 +3153,7 @@ wax.interaction = function() {
         if (attach) attach(map);
         bean.add(parent(), defaultEvents);
         bean.add(parent(), 'touchstart', onDown);
+        bean.add(parent(), 'MSPointerDown', onDown);
         return interaction;
     };
 

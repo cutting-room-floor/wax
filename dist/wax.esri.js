@@ -2538,28 +2538,7 @@ var Mustache = (typeof module !== "undefined" && module.exports) || {};
   }
 
   return reqwest
-});var wax = wax || {};
-wax.ol = wax.ol || {};
-
-wax.ol.connector = function(tilejson) {
-    for (var i = 0; i < tilejson.tiles.length; i++) {
-        tilejson.tiles[i] = tilejson.tiles[i]
-            .replace('{z}', '${z}')
-            .replace('{x}', '${x}')
-            .replace('{y}', '${y}');
-    }
-    var l = new OpenLayers.Layer.XYZ(
-        tilejson.name,
-        tilejson.tiles, {
-            sphericalMercator: true,
-            zoomOffset: tilejson.minzoom,
-            numZoomLevels: 1 + tilejson.maxzoom - tilejson.minzoom,
-            attribution: tilejson.attribution
-        });
-    l.CLASS_NAME = 'Wax.Layer';
-    return l;
-};
-;wax = wax || {};
+});wax = wax || {};
 
 // Attribution
 // -----------
@@ -3781,124 +3760,141 @@ wax.u = {
     }
 };
 wax = wax || {};
-wax.ol = wax.ol || {};
+wax.esri = wax.esri || {};
 
-wax.ol.interaction = function() {
-    var dirty = false, _grid, map;
+// Attribution
+// -----------
+// Attribution wrapper for Modest Maps.
+wax.esri.attribution = function(map, tilejson) {
+    tilejson = tilejson || {};
+    var a, // internal attribution control
+        attribution = {};
+
+    attribution.element = function() {
+        return a.element();
+    };
+
+    attribution.appendTo = function(elem) {
+        wax.u.$(elem).appendChild(a.element());
+        return this;
+    };
+
+    attribution.init = function() {
+        a = wax.attribution();
+        a.content(tilejson.attribution);
+        a.element().className = 'map-attribution map-mm';
+        return this;
+    };
+
+    return attribution.init();
+};
+wax = wax || {};
+wax.esri = wax.esri || {};
+
+wax.esri.interaction = function() {
+    var dirty = false, _grid, map, dojo_connections;
 
     function setdirty() { dirty = true; }
 
-    function getlayers() {
-        var l = [];
-        for (var i in map.layers) {
-            // TODO: make better indication of whether
-            // this is an interactive layer
-            if ((map.layers[i].visibility === true) &&
-                (map.layers[i].CLASS_NAME === 'Map.Layer')) {
-              l.push(map.layers[i]);
-            }
-        }
-        return l;
-    }
-
     function grid() {
+
         if (!dirty && _grid) {
             return _grid;
         } else {
             _grid = [];
-            var layers = getlayers();
-            for (var j = 0; j < layers.length; j++) {
-                for (var x = 0; x < layers[j].grid.length; x++) {
-                    for (var y = 0; y < layers[j].grid[x].length; y++) {
-                        var divpos;
-                        if (layers[j].grid[x][y].imgDiv) {
-                            divpos = wax.u.offset(layers[j].grid[x][y].imgDiv);
-                        } else {
-                            divpos = wax.u.offset(layers[j].grid[x][y].frame);
-                        }
-                        if (divpos &&
-                            ((divpos.top < pos.y) &&
-                             ((divpos.top + 256) > pos.y) &&
-                             (divpos.left < pos.x) &&
-                             ((divpos.left + 256) > pos.x))) {
-                            tiles.push(layers[j].grid[x][y]);
-                        }
-                    }
+            for (var i = 0; i < map.layerIds.length; i++) {
+                var layer = map.getLayer(map.layerIds[i]);
+
+                // This is not in the documented API and may break.
+                // Blame paleogeographers for not considering implementation
+                // to be an important detail of web maps.
+                var div = layer._div;
+                var ims = div.getElementsByTagName('img');
+                for (var j = 0; j < ims.length; j++) {
+                    var tileOffset = wax.u.offset(ims[j]);
+                    _grid.push([
+                        tileOffset.top,
+                        tileOffset.left,
+                        ims[j]
+                    ]);
                 }
             }
-            return tiles;
         }
+        return _grid;
     }
 
     function attach(x) {
         if (!arguments.length) return map;
         map = x;
-        map.events.on({
-            addlayer: setdirty,
-            changelayer: setdirty,
-            removelayer: setdirty,
-            changebaselayer: setdirty
-        });
+        dojo_connections = [
+          dojo.connect(map, 'onExtentChange', setdirty),
+          dojo.connect(map, 'onUpdateEnd', setdirty),
+          dojo.connect(map, "onReposition", setdirty)
+        ];
     }
 
     function detach(x) {
-        map.events.un({
-            addlayer: setdirty,
-            changelayer: setdirty,
-            removelayer: setdirty,
-            changebaselayer: setdirty
-        });
+        for (var i = 0; i < dojo_connections.length; i++) {
+            dojo.disconnect(dojo_connections[i]);
+        }
     }
 
     return wax.interaction()
         .attach(attach)
+        .detach(detach)
         .parent(function() {
-          return map.div;
+          return map.root;
         })
         .grid(grid);
 };
+dojo.declare('wax.esri.connector', esri.layers.TiledMapServiceLayer, { // create WMTSLayer by extending esri.layers.TiledMapServiceLayer
+  constructor: function(options) {
+    options = options || {};
 
-// Wax: Legend Control
-// -------------------
+    this.options = {
+      tiles: options.tiles,
+      minzoom: options.minzoom || 0,
+      maxzoom: options.maxzoom || 22
+    };
 
-;var wax = wax || {};
-wax.ol = wax.ol || {};
+    var lim = 20037508.342789; // don't repeat this too much
+    this.spatialReference = new esri.SpatialReference({
+      wkid: 3857
+    });
+    this.initialExtent = new esri.geometry.Extent(-lim, -lim, lim, lim, this.spatialReference);
+    this.fullExtent = this.initialExtent;
 
-wax.ol.Legend = OpenLayers.Class(OpenLayers.Control, {
-    CLASS_NAME: 'map.ol.Legend',
-    legend: null,
-    options: null,
-
-    initialize: function(options) {
-        this.options = options || {};
-        OpenLayers.Control.prototype.initialize.apply(this, [options || {}]);
-    },
-
-    activate: function() {
-        this.legend = new wax.legend(this.map.viewPortDiv, this.options.container);
-        return OpenLayers.Control.prototype.activate.apply(this, arguments);
-    },
-
-    setMap: function(map) {
-        OpenLayers.Control.prototype.setMap.apply(this, arguments);
-        this.activate();
-        this.map.events.on({
-            'addlayer': this.setLegend,
-            'changelayer': this.setLegend,
-            'removelayer': this.setLegend,
-            'changebaselayer': this.setLegend,
-            scope: this
-        });
-    },
-
-    setLegend: function() {
-        var urls = [];
-        for (var i = 0; i < this.map.layers.length; i++) {
-            var layer = this.map.layers[i];
-            if (layer && layer.getURL && layer.visibility) {
-                urls.push(layer.getURL(new OpenLayers.Bounds()));
-            }
-        }
-        this.legend.render(urls);
+    var lods = [];
+    for (var z = this.options.minzoom; z <= this.options.maxzoom; z++) {
+      lods.push({
+        'level': z,
+        'scale': 591657527.591555 / Math.pow(2, z),
+        'resolution': 156543.033928 / Math.pow(2, z)
+      });
     }
+
+    this.tileInfo = new esri.layers.TileInfo({
+      spatialReference: {
+        wkid: '3857'
+      },
+      rows: 256,
+      cols: 256,
+      origin: {
+        x: -lim,
+        y: lim
+      },
+      lods: lods
+    });
+
+    this.loaded = true;
+    this.onLoad(this);
+  },
+
+  getTileUrl: function(z, y, x) {
+    return this.options.tiles[parseInt(Math.pow(2, z) * y + x, 10) %
+      this.options.tiles.length]
+      .replace('{z}', z)
+      .replace('{x}', x)
+      .replace('{y}', y);
+  }
 });
