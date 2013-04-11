@@ -29,6 +29,12 @@ wax.interaction = function() {
         touchcancel: touchCancel
     };
 
+    var pointerEnds = {
+        MSPointerUp: onUp,
+        MSPointerMove: onUp,
+        MSPointerCancel: touchCancel
+    };
+
     // Abstract getTile method. Depends on a tilegrid with
     // grid[ [x, y, tile] ] structure.
     function getTile(e) {
@@ -103,7 +109,7 @@ wax.interaction = function() {
             bean.fire(interaction, 'off');
             // Touch moves invalidate touches
             bean.add(parent(), touchEnds);
-        } else if (e.originalEvent.type === "MSPointerDown") {
+        } else if (e.originalEvent.type === "MSPointerDown" && e.originalEvent.touches.length === 1) {
           // Don't make the user click close if they hit another tooltip
             bean.fire(interaction, 'off');
             // Touch moves invalidate touches
@@ -118,28 +124,31 @@ wax.interaction = function() {
 
     function touchCancel() {
         bean.remove(parent(), touchEnds);
+        bean.remove(parent(), pointerEnds);
         _downLock = false;
     }
 
     function onUp(e) {
         var evt = {},
-            pos = wax.u.eventoffset(e);
+            pos = wax.u.eventoffset(e.originalEvent);
         _downLock = false;
 
-        // TODO: refine
-        for (var key in e) {
-          evt[key] = e[key];
+        for (var key in e.originalEvent) {
+          evt[key] = e.originalEvent[key];
         }
+
+        evt.changedTouches = [];
 
         bean.remove(document.body, 'mouseup', onUp);
         bean.remove(parent(), touchEnds);
+        bean.remove(parent(), pointerEnds);
 
         if (e.type === 'touchend') {
             // If this was a touch and it survived, there's no need to avoid a double-tap
             // but also wax.u.eventoffset will have failed, since this touch
             // event doesn't have coordinates
             interaction.click(e, _d);
-        } else if (e.originalEvent.type === "MSPointerMove" || e.originalEvent.type === "MSPointerUp") {
+        } else if (evt.type === "MSPointerMove" || evt.type === "MSPointerUp") {
             interaction.click(evt, pos);
         } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
             Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
@@ -201,6 +210,7 @@ wax.interaction = function() {
         if (attach) attach(map);
         bean.add(parent(), defaultEvents);
         bean.add(parent(), 'touchstart', onDown);
+        bean.add(parent(), 'MSPointerDown', onDown);
         return interaction;
     };
 
