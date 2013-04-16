@@ -106,6 +106,12 @@ wax.u = {
         var posx = 0;
         var posy = 0;
         if (!e) { e = window.event; }
+        if (e.type == "MSPointerMove" || e.type == "MSPointerDown" || e.type == "MSPointerUp") {
+          return {
+            x: e.pageX + window.pageXOffset,
+            y: e.pageY + window.pageYOffset
+          }
+        }
         if (e.pageX || e.pageY) {
             // Good browsers
             return {

@@ -71,7 +71,8 @@ wax.interaction = function() {
         // to avoid performance hits.
         if (_downLock) return;
 
-        var pos = wax.u.eventoffset(e);
+        var _e = (e.type != "MSPointerMove" ? e : e.originalEvent);
+        var pos = wax.u.eventoffset(_e);
 
         interaction.screen_feature(pos, function(feature) {
             if (feature) {
@@ -96,7 +97,8 @@ wax.interaction = function() {
         // Store this event so that we can compare it to the
         // up event
         _downLock = true;
-        _d = wax.u.eventoffset(e);
+        var _e = (e.type != "MSPointerDown" ? e : e.originalEvent); 
+        _d = wax.u.eventoffset(_e);
         if (e.type === 'mousedown') {
             bean.add(document.body, 'click', onUp);
             // track mouse up to remove lockDown when the drags end
@@ -130,12 +132,18 @@ wax.interaction = function() {
 
     function onUp(e) {
         var evt = {},
-            pos = wax.u.eventoffset(e.originalEvent);
+            _e = (e.type != "MSPointerMove" && e.type != "MSPointerUp" ? e : e.originalEvent),
+            pos = wax.u.eventoffset(_e);
         _downLock = false;
 
-        for (var key in e.originalEvent) {
-          evt[key] = e.originalEvent[key];
+        for (var key in _e) {
+          evt[key] = _e[key];
         }
+
+        // for (var key in e) {
+        //   evt[key] = e[key];
+        // }
+
 
         evt.changedTouches = [];
 
