@@ -12,7 +12,7 @@ a remote server. That looks like:
 <pre class='prettyprint'>
 &lt;script
   type='text/javascript'
-  src='http://serverapi.arcgisonline.com/jsapi/arcgis/?v=2.8'&gt;&lt;/script&gt;
+  src='https://serverapi.arcgisonline.com/jsapi/arcgis/?v=2.8'&gt;&lt;/script&gt;
 &lt;link
   rel='stylesheet'
   type='text/css'

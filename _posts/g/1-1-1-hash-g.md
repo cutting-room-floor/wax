@@ -11,7 +11,7 @@ the initial user.
 &lt;html&gt;
 &lt;head&gt;
   &lt;script
-    src='http://maps.google.com/maps/api/js?sensor=false'
+    src='https://maps.google.com/maps/api/js?sensor=false'
     type='text/javascript'&gt;&lt;/script&gt;
   &lt;script
     src='wax/dist/wax.g.min.js'
