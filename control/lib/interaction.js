@@ -111,7 +111,7 @@ wax.interaction = function() {
             bean.fire(interaction, 'off');
             // Touch moves invalidate touches
             bean.add(parent(), touchEnds);
-        } else if (e.originalEvent.type === "MSPointerDown" && e.originalEvent.touches.length === 1) {
+        } else if (e.originalEvent.type === "MSPointerDown" && e.originalEvent.touches && e.originalEvent.touches.length === 1) {
           // Don't make the user click close if they hit another tooltip
             bean.fire(interaction, 'off');
             // Touch moves invalidate touches
