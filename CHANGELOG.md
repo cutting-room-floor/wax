@@ -1,5 +1,9 @@
 ## Changelog
 
+## UNRELEASED 7.0.1
+
+* Fixed interactivity error when there are more than touch at the same time
+
 ## UNRELEASED 7.0.0
 
 * Removes the `wax.mm.latlngtooltip()`
