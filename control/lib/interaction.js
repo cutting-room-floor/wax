@@ -156,7 +156,7 @@ wax.interaction = function() {
             // but also wax.u.eventoffset will have failed, since this touch
             // event doesn't have coordinates
             interaction.click(e, _d);
-        } else if (pos) {
+        } else if (pos && _d) {
           // If pos is not defined means wax can't calculate event position,
           // So next cases aren't possible.
 
