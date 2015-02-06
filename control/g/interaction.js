@@ -56,6 +56,7 @@ wax.g.interaction = function() {
     return wax.interaction()
         .attach(attach)
         .detach(detach)
+        .discardTouchMove(true)
         .parent(function() {
           return map.getDiv();
         })
